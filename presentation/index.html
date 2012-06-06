@@ -90,7 +90,11 @@ No surprises here:
 ---
 _fold_ = higher-order function that knows how to reduce a given data structure (typically a sequence of elements) into a single return value - [CodeBetter - fun with folds](http://codebetter.com/matthewpodwysocki/2009/02/14/fun-with-folds "Fun with folds")
 
-- foldl - Keep an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
+![Fold](http://cuboplano.com/wp-content/uploads/2010/08/fold-origami-crane.gif)
+
+---
+
+# foldl - Keep an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
 
 A left fold factorial calculation would be
 	
@@ -113,7 +117,7 @@ To illustrate whats really happening, lets show what we're doing for x = 3
 ---
 
 
-- foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head. 
+# foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head. 
 	foldr (*) [1 .. 3] 1
 		= 1 * foldr (*) [2, 3] 1
 		= 1 * 2 * foldr (*) [3] 1
