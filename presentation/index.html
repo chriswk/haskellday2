@@ -25,15 +25,136 @@ Part 2
 ---
 
 # Higher Order Functions
-  - Anonymous Functions
-	In the form of 
-		(\param1 .. paramn -> function_body) args
-	Example (Square the number and then add 2)
-		Prelude> (\x -> x**2 + 2) 4
-		18.0
+  - _Anonymous Functions_
+	  - Syntax:  
+			(\param1 .. paramn -> function_body) args
+
+  	  Example: (Square the number and then add 2)
+
+			Prelude> (\x -> x*x + 2) 4
+			18.0
+
+---
+
+# Map
+ 
+Just as most other functional languages, haskell has _map_ which takes a function and a list, and returns a new list with the function applied to each of the elements in the list. This can be used together with an anonymous function to for instance return a new list where we cube each element in the list.
 		
+	Prelude> map (\x -> x*x*x) [1, 2, 3]
+	[1, 8, 27]
 		
-			
+_map_ can also be used with part of functions - called _section_
+	Prelude> map (+ 42) [42, 84, 126]
+	[84, 126, 168]
+
+Getting a bit ahead of ourselves, this is part of Partially applied functions.
+
+---
+
+# Where	
+
+	
+_where_ is used in conjunction with modules to define methods. This means we can define our 'fancy' anonymous cube function to become a locally scoped function instead	
+	
+	module WhereExample where
+		cubeAll list = map cube list
+			where cube x = x * x * x
+				
+We've now defined a module with one method "cubeAll" which takes a list and maps the locally defined cube function on each element in the list. As we can see _where_ is also used for defining methods for a module. Opening __ghci__ and loading this file
+
+	:load whereexample.hs
+	[1 of 1] Compiling WhereExample (whereexample.hs, interpreted)
+	Ok, modules loaded: WhereExample
+	*WhereExample> cubeAll [1, 2, 3]
+	[1, 8, 27]
+	
+
+---
+
+# List functions
+- filter
+- folds
+	- foldl
+	- foldr
+	
+No surprises here: 
+
+- filter applies a test to items in a list and returns a new list with only the elements that passed the test.
+
+
+	Prelude> even 8
+	True
+	Prelude> filter even [1, 2, 4, 5, 7, 8]
+	[2,4,8]
+
+---
+_fold_ = higher-order function that knows how to reduce a given data structure (typically a sequence of elements) into a single return value - [CodeBetter - fun with folds](http://codebetter.com/matthewpodwysocki/2009/02/14/fun-with-folds "Fun with folds")
+
+- foldl - Keep an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
+
+A left fold factorial calculation would be
+	
+	Prelude> let fact x = foldl (*) 1 [ 1 .. x ]
+	Prelude> fact 9
+	362880
+	Prelude> fact 10
+	3628800
+	
+To illustrate whats really happening, lets show what we're doing for x = 3
+
+	foldl (*) 1 [1 .. 3]
+		= foldl (*) (1 * 1) ([2, 3]))
+		= foldl (*) (1 * 1 * 2) ([3]))
+		= foldl (*) (1 * 1 * 2 * 3) ([])
+		= (1 * 1 * 2 * 3)
+		= 6
+
+		
+---
+
+
+- foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head. 
+	foldr (*) [1 .. 3] 1
+		= 1 * foldr (*) [2, 3] 1
+		= 1 * 2 * foldr (*) [3] 1
+		= 1 * 2 * 3 * foldr (*) [] 1
+		= 1 * 2 * 3 * 1
+		= 6
+
+---
+
+# Partially applied functions - Currying 
+
+![Curry](http://cdn.sailusfood.com/wp-content/uploads/2006/06/spicy_chicken_masala_curry.JPG)
+
+---
+
+# Currying
+
+Currying is present in almost all of the languages we've covered, but Haskell is probably the language that uses it the most. Since Haskell only allows one argument to every function, when we write 
+	
+	let prod x y = x * y
+
+Haskell actually applies (prod x) y to give an answer. For
+
+	prod 2 4
+	
+Haskell applies prod 2 which yields the anonymous function: 
+
+	(\y -> 2 * y)
+	
+then it applies the anonymous function to the second argument 
+	
+	(\y -> 2 * y) 4
+	
+which gives
+	
+	8
+	
+---
+
+
+	
 	</textarea>
 	<div id="slideshow"></div>
 </body>
