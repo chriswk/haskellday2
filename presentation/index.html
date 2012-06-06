@@ -2,7 +2,11 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Seven languages in Seven Weeks : Haskell Day 2</title>
-		<script src="https://github.com/gnab/remark/downloads/remark-0.3.6.min.js"></script>
+		<script src="https://github.com/gnab/remark/downloads/remark-0.3.6.min.js">
+			{ "highlightLanguage" : "haskell",
+			  "highlightStyle" : "github"
+			}
+		</script>
 		<style type="text/css" media="screen">
 			/** Extra styles **/
 		</style>
@@ -94,7 +98,9 @@ _fold_ = higher-order function that knows how to reduce a given data structure (
 
 ---
 
-# foldl - Keep an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
+# foldl
+
+foldl Keeps an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
 
 A left fold factorial calculation would be
 	
@@ -110,20 +116,31 @@ To illustrate whats really happening, lets show what we're doing for x = 3
 		= foldl (*) (1 * 1) ([2, 3]))
 		= foldl (*) (1 * 1 * 2) ([3]))
 		= foldl (*) (1 * 1 * 2 * 3) ([])
-		= (1 * 1 * 2 * 3)
+		= (((1 * 1) * 2) * 3)
 		= 6
 
-		
+Or let's let Haskell show us what it sees before summing
+	
+	Prelude> putStrLn $ foldl (\x y -> concat [ "(", x, "*", y, ")"]) "1" (map show [1..3])
+	(((1*1)*2)*3)
+
 ---
 
+# foldr
 
-# foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head. 
+foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head.
+ 
 	foldr (*) [1 .. 3] 1
 		= 1 * foldr (*) [2, 3] 1
 		= 1 * 2 * foldr (*) [3] 1
 		= 1 * 2 * 3 * foldr (*) [] 1
 		= 1 * 2 * 3 * 1
 		= 6
+		
+Again from Haskell
+
+	Prelude> putStrLn $ foldr (\x y -> concat [ "(", x, "*", y, ")"]) "1" (map show [1..3])
+	(1*(2*(3*1)))
 
 ---
 
@@ -132,7 +149,6 @@ To illustrate whats really happening, lets show what we're doing for x = 3
 ![Curry](http://cdn.sailusfood.com/wp-content/uploads/2006/06/spicy_chicken_masala_curry.JPG)
 
 ---
-
 # Currying
 
 Currying is present in almost all of the languages we've covered, but Haskell is probably the language that uses it the most. Since Haskell only allows one argument to every function, when we write 
@@ -156,9 +172,40 @@ which gives
 	8
 	
 ---
+# Lazy eval
 
-
+Similar to Scala Streams, Haskell allows us to define lazily evaluated sequences avoiding StackoverflowExceptions when we define infinite sequences. All odd Natural numbers can for instance be defined like
 	
+	Prelude> let odd = filter odd [1 .. ]
+
+If we want the 30 first odd numbers we can then do
+	
+	Prelude> take 30 odd
+	[1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59]
+	
+Or for Euler problem 2 : For Fibonacci numbers which value does not exceed 4000000 find the sum of the even numbers
+
+	module Fib where
+		lazyFib x y = x:(lazyFib y (x + y))
+		
+		fib = lazyFib 1 1
+		
+		fibNth x = head (drop (x - 1) (take (x) fib))
+	
+	Prelude> :load fib.hs
+	[1 of 1] Compiling Fib              ( fib.hs, interpreted )
+	Ok, modules loaded: Fib.	
+	Fib*> sum (filter even (takeWhile(< 4000000) fib))
+	4613732
+	
+---
+
+# Tasks
+
+1. Write a function that takes an argument x and returns a lazy sequence that has every third number, starting with x. Then, write a function that includes every fifth number, beginning with y. Combine these functions through composition to return every eighth number, beginning with x + y.
+
+2. Use a partially applied function to define a function that will return half of a number and another that will append \n to the end of any string
+
 	</textarea>
 	<div id="slideshow"></div>
 </body>
