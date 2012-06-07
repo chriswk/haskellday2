@@ -1,1 +1,218 @@
-My Page
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Seven languages in Seven Weeks : Haskell Day 2</title>
+		<script src="https://github.com/gnab/remark/downloads/remark-0.3.6.min.js">
+			{ "highlightLanguage" : "haskell",
+			  "highlightStyle" : "github"
+			}
+		</script>
+		<style type="text/css" media="screen">
+			/** Extra styles **/
+		</style>
+	</head>
+<body>
+	<textarea id="source">
+.center.middle
+# The Haskell Programming Language
+Part 2
+_(Based on Seven Languages in Seven Weeks : Haskell Day 2)_
+
+---
+
+# Agenda - part 2
+
+1. Higher order functions
+2. Partially applied functions and Currying
+3. Lazy evaluation
+
+---
+
+# Higher Order Functions
+  - _Anonymous Functions_
+	  - Syntax:  
+			(\param1 .. paramn -> function_body) args
+
+  	  Example: (Square the number and then add 2)
+
+			Prelude> (\x -> x*x + 2) 4
+			18.0
+
+---
+
+# Map
+ 
+Just as most other functional languages, haskell has _map_ which takes a function and a list, and returns a new list with the function applied to each of the elements in the list. This can be used together with an anonymous function to for instance return a new list where we cube each element in the list.
+		
+	Prelude> map (\x -> x*x*x) [1, 2, 3]
+	[1, 8, 27]
+		
+_map_ can also be used with part of functions - called _section_
+	
+	Prelude> map (+ 42) [42, 84, 126]
+	[84, 126, 168]
+
+Getting a bit ahead of ourselves, this is part of Partially applied functions.
+
+---
+
+# Where	
+
+	
+_where_ is used in conjunction with modules to define methods. This means we can define our 'fancy' anonymous cube function to become a locally scoped function instead	
+	
+	module WhereExample where
+		cubeAll list = map cube list
+			where cube x = x * x * x
+				
+We've now defined a module with one method "cubeAll" which takes a list and maps the locally defined cube function on each element in the list. As we can see _where_ is also used for defining methods for a module. Opening __ghci__ and loading this file
+
+	:load whereexample.hs
+	[1 of 1] Compiling WhereExample (whereexample.hs, interpreted)
+	Ok, modules loaded: WhereExample
+	*WhereExample> cubeAll [1, 2, 3]
+	[1, 8, 27]
+	
+
+---
+
+# List functions
+- filter
+- folds
+	- foldl
+	- foldr
+	
+No surprises here: 
+
+- filter applies a test to items in a list and returns a new list with only the elements that passed the test.
+
+
+	Prelude> even 8
+	True
+	Prelude> filter even [1, 2, 4, 5, 7, 8]
+	[2,4,8]
+
+---
+_fold_ = higher-order function that knows how to reduce a given data structure (typically a sequence of elements) into a single return value - [CodeBetter - fun with folds](http://codebetter.com/matthewpodwysocki/2009/02/14/fun-with-folds "Fun with folds")
+
+![Fold](http://cuboplano.com/wp-content/uploads/2010/08/fold-origami-crane.gif)
+
+---
+
+# foldl
+
+foldl Keeps an accumulator, add result of applying function to head of list to accumulater and iterate until list is empty.
+
+A left fold factorial calculation would be
+	
+	Prelude> let fact x = foldl (*) 1 [ 1 .. x ]
+	Prelude> fact 9
+	362880
+	Prelude> fact 10
+	3628800
+	
+To illustrate whats really happening, lets show what we're doing for x = 3
+
+	foldl (*) 1 [1 .. 3]
+		= foldl (*) (1 * 1) ([2, 3]))
+		= foldl (*) (1 * 1 * 2) ([3]))
+		= foldl (*) (1 * 1 * 2 * 3) ([])
+		= (((1 * 1) * 2) * 3)
+		= 6
+
+---
+
+Or let's let Haskell show us what it sees before summing
+	
+	Prelude> putStrLn $ foldl (\x y -> concat [ "(", x, "*", y, ")"]) "1"
+	 (map show [1..3]) 
+	(((1*1)*2)*3)
+
+---
+
+# foldr
+
+foldr is the right fold operator. I.e. it starts from the end of the list and processes to the head.
+ 
+	foldr (*) [1 .. 3] 1
+		= 1 * foldr (*) [2, 3] 1
+		= 1 * 2 * foldr (*) [3] 1
+		= 1 * 2 * 3 * foldr (*) [] 1
+		= 1 * 2 * 3 * 1
+		= 6
+		
+Again from Haskell
+
+	Prelude> putStrLn $ foldr (\x y -> concat [ "(", x, "*", y, ")"]) "1" 
+	(map show [1..3]) 
+	(1*(2*(3*1)))
+	
+
+---
+
+# Partially applied functions - Currying 
+
+![Curry](http://cdn.sailusfood.com/wp-content/uploads/2006/06/spicy_chicken_masala_curry.JPG)
+
+---
+# Currying
+
+Currying is present in almost all of the languages we've covered, but Haskell is probably the language that uses it the most. Since Haskell only allows one argument to every function, when we write 
+	
+	let prod x y = x * y
+
+Haskell actually applies (prod x) y to give an answer. For
+
+	prod 2 4
+	
+Haskell applies prod 2 which yields the anonymous function: 
+
+	(\y -> 2 * y)
+	
+then it applies the anonymous function to the second argument 
+	
+	(\y -> 2 * y) 4
+	
+which gives
+	
+	8
+
+---
+# Lazy eval
+
+Similar to Scala Streams, Haskell allows us to define lazily evaluated sequences avoiding StackoverflowExceptions when we define infinite sequences. All odd Natural numbers can for instance be defined like
+	
+	Prelude> let odd = filter odd [1 .. ]
+
+If we want the 30 first odd numbers we can then do
+	
+	Prelude> take 30 odd
+	[1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59]
+
+---
+Or for Euler problem 2 : _For Fibonacci numbers which value does not exceed 4000000 find the sum of the even numbers_
+
+	module Fib where
+		lazyFib x y = x:(lazyFib y (x + y))
+		
+		fib = lazyFib 1 1
+		
+		fibNth x = head (drop (x - 1) (take (x) fib))
+	
+	Prelude> :load fib.hs
+	[1 of 1] Compiling Fib              ( fib.hs, interpreted )
+	Ok, modules loaded: Fib.	
+	Fib*> sum (filter even (takeWhile(< 4000000) fib))
+	4613732
+
+---
+# Tasks
+
+1. Write a function that takes an argument x and returns a lazy sequence that has every third number, starting with x. Then, write a function that includes every fifth number, beginning with y. Combine these functions through composition to return every eighth number, beginning with x + y.
+
+2. Use a partially applied function to define a function that will return half of a number and another that will append \n to the end of any string
+
+	</textarea>
+	<div id="slideshow"></div>
+</body>
+</html>
