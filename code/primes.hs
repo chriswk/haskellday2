@@ -22,3 +22,5 @@ module Prime where
 		
 	primes = 2 : 3 : ([5,7..] `minus` unionAll [[p*p, p*p+2*p..] | p <- tail primes])
 		where unionAll s = foldi (\(x:xs) ys -> x : union xs ys) [] s
+	
+	nthprime n = last (take n primes)
