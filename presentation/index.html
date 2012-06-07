@@ -16,7 +16,7 @@
 .center.middle
 # The Haskell Programming Language
 Part 2
-(Based on Seven Languages in Seven Weeks : Haskell Day 2)
+_(Based on Seven Languages in Seven Weeks : Haskell Day 2)_
 
 ---
 
@@ -48,6 +48,7 @@ Just as most other functional languages, haskell has _map_ which takes a functio
 	[1, 8, 27]
 		
 _map_ can also be used with part of functions - called _section_
+	
 	Prelude> map (+ 42) [42, 84, 126]
 	[84, 126, 168]
 
@@ -119,9 +120,12 @@ To illustrate whats really happening, lets show what we're doing for x = 3
 		= (((1 * 1) * 2) * 3)
 		= 6
 
+---
+
 Or let's let Haskell show us what it sees before summing
 	
-	Prelude> putStrLn $ foldl (\x y -> concat [ "(", x, "*", y, ")"]) "1" (map show [1..3])
+	Prelude> putStrLn $ foldl (\x y -> concat [ "(", x, "*", y, ")"]) "1"
+	 (map show [1..3]) 
 	(((1*1)*2)*3)
 
 ---
@@ -139,8 +143,10 @@ foldr is the right fold operator. I.e. it starts from the end of the list and pr
 		
 Again from Haskell
 
-	Prelude> putStrLn $ foldr (\x y -> concat [ "(", x, "*", y, ")"]) "1" (map show [1..3])
+	Prelude> putStrLn $ foldr (\x y -> concat [ "(", x, "*", y, ")"]) "1" 
+	(map show [1..3]) 
 	(1*(2*(3*1)))
+	
 
 ---
 
@@ -170,7 +176,7 @@ then it applies the anonymous function to the second argument
 which gives
 	
 	8
-	
+
 ---
 # Lazy eval
 
@@ -182,8 +188,9 @@ If we want the 30 first odd numbers we can then do
 	
 	Prelude> take 30 odd
 	[1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59]
-	
-Or for Euler problem 2 : For Fibonacci numbers which value does not exceed 4000000 find the sum of the even numbers
+
+---
+Or for Euler problem 2 : _For Fibonacci numbers which value does not exceed 4000000 find the sum of the even numbers_
 
 	module Fib where
 		lazyFib x y = x:(lazyFib y (x + y))
@@ -197,9 +204,8 @@ Or for Euler problem 2 : For Fibonacci numbers which value does not exceed 40000
 	Ok, modules loaded: Fib.	
 	Fib*> sum (filter even (takeWhile(< 4000000) fib))
 	4613732
-	
----
 
+---
 # Tasks
 
 1. Write a function that takes an argument x and returns a lazy sequence that has every third number, starting with x. Then, write a function that includes every fifth number, beginning with y. Combine these functions through composition to return every eighth number, beginning with x + y.
